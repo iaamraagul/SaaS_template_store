@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.*
+!.env.example
+dist/
+coverage/
+.DS_Store
+*.log
+
+# Local design references and generated development files
+saastemplates_codex_kit/
+client/dist/
+
