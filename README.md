@@ -106,4 +106,4 @@ The API tests use `mongodb-memory-server`, which downloads a test MongoDB binary
 Repository target: `https://github.com/iaamraagul/SaaS_template_store`
 
 Developer: Raagul
-Contact: [Add your preferred email or LinkedIn before submission]
+Contact: https://github.com/iaamraagul
