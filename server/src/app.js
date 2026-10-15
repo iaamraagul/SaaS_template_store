@@ -7,8 +7,9 @@ import authRoutes from "./routes/auth.js";
 import templateRoutes from "./routes/templates.js";
 import favoriteRoutes from "./routes/favorites.js";
 const app = express();
+const normalizedClientUrl = env.clientUrl.replace(/\/+$/, "");
 const allowedOrigins = new Set([
-  env.clientUrl,
+  normalizedClientUrl,
   "http://localhost:5173",
   "http://127.0.0.1:5173",
   "http://localhost:5174",
@@ -18,7 +19,11 @@ app.use(helmet());
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.has(origin)) return callback(null, true);
+      const isVercelPreview = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(
+        origin || "",
+      );
+      if (!origin || allowedOrigins.has(origin) || isVercelPreview)
+        return callback(null, true);
       return callback(new Error("Origin is not allowed by CORS."));
     },
   }),
@@ -30,6 +35,12 @@ app.get("/api/health", (_req, res) =>
 app.use("/api/auth", authRoutes);
 app.use("/api/templates", templateRoutes);
 app.use("/api/favorites", favoriteRoutes);
+
+// Keep the API usable when a hosting provider is configured with the domain
+// only and omits the `/api` suffix from VITE_API_URL.
+app.use("/auth", authRoutes);
+app.use("/templates", templateRoutes);
+app.use("/favorites", favoriteRoutes);
 app.use((_req, res) =>
   res.status(404).json({ success: false, message: "Route not found." }),
 );
