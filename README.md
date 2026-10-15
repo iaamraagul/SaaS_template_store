@@ -1,46 +1,84 @@
-# SaaSTemplates — Premium SaaS Template Marketplace
+# SaaSTemplates
 
-SaaSTemplates is a full-stack mini marketplace for premium SaaS templates. It follows the supplied UX Pilot references while using the Express API for authentication, template data, and favorites.
+## Premium SaaS template marketplace
 
-## Features
+SaaSTemplates is a bright, responsive marketplace for discovering and saving polished SaaS interface templates. The project combines a React/Vite frontend with an Express/MongoDB API, JWT authentication, searchable catalog data, and persistent favorites.
 
-- Responsive marketplace with the supplied six template thumbnails
-- Search, category filtering, empty states, and a Clear action
-- JWT login and registration with bcrypt-hashed passwords
-- Axios-powered frontend API client with bearer-token handling
-- Protected Favorites route and authenticated favorite add/remove actions
-- Persistent JWT, user session, and favorite state in localStorage
-- Password visibility controls, validation, logout, and return-to-login redirects
-- CSS depth treatment, layered device artwork, responsive cards, and mobile layouts
-- Render and Vercel deployment configuration
+## Product preview
 
-## Stack
+The screenshots below show the live marketplace experience, catalog cards, and account registration flow.
 
-- Frontend: React, Vite, React Router, Axios, JavaScript, CSS, Lucide React
-- Backend: Node.js, Express, Mongoose, MongoDB, JWT, bcryptjs
-- Tests: Vitest, Supertest, mongodb-memory-server
+![SaaSTemplates marketplace home](docs/screenshots/marketplace-home.png)
+
+![SaaSTemplates catalog and footer](docs/screenshots/catalog-footer.png)
+
+![SaaSTemplates registration flow](docs/screenshots/signup-flow.png)
+
+## What is included
+
+- Responsive marketplace homepage with a layered, depth-focused visual style
+- Ten seeded SaaS templates using the supplied thumbnail artwork
+- Search by template name and description
+- Category filtering with a clear-filters action
+- Authenticated favorites with add/remove controls
+- Favorite state persisted through the API and local browser session
+- JWT registration and login flows with bcrypt password hashing
+- Password visibility controls, validation messages, logout, and protected routes
+- SPA navigation for marketplace, login, signup, and favorites pages
+- API aliases for both `/api/...` and the shorter root route format
+- Render API configuration and Vercel SPA fallback configuration
+
+## Technology
+
+| Layer | Tools |
+| --- | --- |
+| Frontend | React, Vite, React Router, Axios, JavaScript, CSS, Lucide React |
+| Backend | Node.js, Express, Mongoose, MongoDB, JWT, bcryptjs |
+| Quality | Vitest, Supertest, mongodb-memory-server |
+| Hosting | Vercel for the client, Render for the API |
+
+## Project layout
 
 ```text
-client/src/{components,context,data,hooks,pages,services,App.jsx,main.jsx,index.css}
-server/src/{config,controllers,middleware,models,routes,utils,app.js,server.js}
+client/
+  public/templates/       supplied template thumbnails
+  src/components/         reusable UI components
+  src/context/            authentication and session state
+  src/pages/              marketplace, auth, and favorites screens
+  src/services/           API client and request helpers
+server/
+  src/controllers/        request handlers
+  src/models/             MongoDB models
+  src/routes/             API routes
+  src/utils/seed.js       catalog seed data
+docs/screenshots/         README product screenshots
+render.yaml               Render service configuration
 ```
 
-## Local setup
+## Run locally
 
-Requirements: Node.js 18+ and MongoDB (local or Atlas).
+Requirements: Node.js 18 or newer and a MongoDB database, either local or MongoDB Atlas.
 
-Backend terminal:
+### 1. Start the API
 
 ```powershell
 cd server
 npm install
 Copy-Item .env.example .env
-# Set MONGODB_URI and a long random JWT_SECRET in .env
+```
+
+Update `server/.env` with a MongoDB connection string and a long random `JWT_SECRET`, then seed the catalog and start the server:
+
+```powershell
 npm run seed
 npm run dev
 ```
 
-Frontend terminal:
+The API runs at `http://localhost:5000`.
+
+### 2. Start the frontend
+
+Open a second terminal:
 
 ```powershell
 cd client
@@ -49,58 +87,83 @@ Copy-Item .env.example .env
 npm run dev
 ```
 
-The frontend runs at `http://localhost:5173`; the API runs at `http://localhost:5000`.
+The frontend runs at `http://localhost:5173`. Set `VITE_API_URL` in `client/.env` to the API origin, for example:
 
-## Seed templates
+```text
+VITE_API_URL=http://localhost:5000
+```
 
-The seed script currently creates ten templates. Run it from the `server/` folder after `MONGODB_URI` points to the database you want to populate:
+`VITE_API_URL` is a public client configuration value; never put database credentials or JWT secrets in a `VITE_*` variable.
+
+## Add and seed templates
+
+The catalog is defined in [server/src/utils/seed.js](server/src/utils/seed.js). To add a template, append an object to the `templates` array:
+
+```js
+{
+  name: "New Template",
+  description: "A short description for the marketplace card.",
+  thumbnail_url: "/templates/atlas-dashboard.jpg",
+  category: "SAAS",
+  price: 69,
+  technology: "REACT",
+  added: "ADDED TODAY"
+}
+```
+
+Use a unique template name. If you add a new thumbnail, place it in `client/public/templates/` and commit it with the seed change. Then run:
 
 ```powershell
 cd server
 npm run seed
 ```
 
-To add another template, add an object to the `templates` array in `server/src/utils/seed.js`. Use a unique `name`, a description, one of the existing thumbnail paths, a category, price, technology, and added label. Run `npm run seed` again; existing templates are updated by name and your new template is inserted. The script only removes the old sample records from the previous seed set, so it does not wipe custom templates.
+The seed command updates templates by name and inserts new templates without wiping custom records. Render is configured to run the same seed command during deployment, so pushing a catalog change to `main` reseeds the production catalog automatically.
 
-Render deployments run `npm run seed` automatically after installing dependencies. This requires `MONGODB_URI` to be configured in Render before deploying. If you are using a plan without Shell access, pushing a new commit is the way to reseed the production catalog. You can also run the same command locally with the production Atlas URI in a temporary uncommitted `server/.env` file.
+## Application routes
 
-## Routes
+| Route | Description |
+| --- | --- |
+| `/` | Marketplace home |
+| `/templates` | Marketplace catalog |
+| `/login` | Login form |
+| `/register` | Registration form |
+| `/signup` | Registration alias |
+| `/favorites` | Authenticated favorites |
 
-| Path         | Purpose                                        |
-| ------------ | ---------------------------------------------- |
-| `/`          | Marketplace home                               |
-| `/templates` | Marketplace page required by the assessment    |
-| `/login`     | Login form                                     |
-| `/register`  | Registration form                              |
-| `/signup`    | Registration alias used by the supplied design |
-| `/favorites` | Authenticated favorites page                   |
-
-## API
+## API reference
 
 Successful responses use `{ success: true, data }`; errors use `{ success: false, message }`.
 
-| Method | Endpoint                           | Auth       | Purpose                              |
-| ------ | ---------------------------------- | ---------- | ------------------------------------ |
-| GET    | `/api/health`                      | No         | Health check                         |
-| POST   | `/api/auth/register`               | No         | Create a user and return a JWT       |
-| POST   | `/api/auth/login`                  | No         | Authenticate a user and return a JWT |
-| GET    | `/api/templates?search=&category=` | No         | List and filter templates            |
-| GET    | `/api/templates/:id`               | No         | Return template details              |
-| GET    | `/api/favorites`                   | Bearer JWT | Return the current user's favorites  |
-| POST   | `/api/favorites/:templateId`       | Bearer JWT | Add a favorite                       |
-| DELETE | `/api/favorites/:templateId`       | Bearer JWT | Remove a favorite                    |
+| Method | Endpoint | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/health` | No | Check API status |
+| POST | `/api/auth/register` | No | Create a user and return a JWT |
+| POST | `/api/auth/login` | No | Authenticate a user and return a JWT |
+| GET | `/api/templates?search=&category=` | No | List and filter templates |
+| GET | `/api/templates/:id` | No | Return one template |
+| GET | `/api/favorites` | Bearer JWT | List the current user's favorites |
+| POST | `/api/favorites/:templateId` | Bearer JWT | Add a favorite |
+| DELETE | `/api/favorites/:templateId` | Bearer JWT | Remove a favorite |
 
-## Hosting
+## Deploy
 
-The repository includes `render.yaml` for the API and `client/vercel.json` for SPA routing. A typical deployment is:
+### Render API
 
-1. Create a MongoDB Atlas database.
-2. Deploy `server/` to Render using `render.yaml`.
-3. Set `MONGODB_URI`, `JWT_SECRET`, and `CLIENT_URL` in Render.
-4. Deploy `client/` to Vercel.
-5. Set `VITE_API_URL` to the deployed API's `/api` URL in Vercel.
+1. Create a Render web service from this repository.
+2. Use the `server` directory as the service root.
+3. Configure `MONGODB_URI`, `JWT_SECRET`, and `CLIENT_URL` in Render.
+4. Use the build command `npm install && npm run seed`.
+5. Use the start command `npm start`.
 
-Actual hosting still requires the owner's Render, Vercel, MongoDB, and GitHub accounts; no credentials are stored in this repository.
+### Vercel frontend
+
+1. Import the repository into Vercel.
+2. Set the project root to `client`.
+3. Set `VITE_API_URL` to the Render API origin.
+4. Deploy and verify that `/`, `/templates`, `/login`, `/signup`, and `/favorites` load correctly.
+
+The committed `client/vercel.json` keeps client-side routes working after a refresh.
 
 ## Verification
 
@@ -112,11 +175,15 @@ cd ../server
 npm test
 ```
 
-The API tests use `mongodb-memory-server`, which downloads a test MongoDB binary the first time they run. If that download is blocked by a network policy, run the app against the configured local or Atlas MongoDB and rerun the checks.
+The API tests use `mongodb-memory-server`. Its first run may download a MongoDB test binary.
 
-## Submission
+## Contact
 
-Repository target: `https://github.com/iaamraagul/SaaS_template_store`
+Built and maintained by **Raagul**.
 
-Developer: Raagul
-Contact: https://github.com/iaamraagul
+- Email: [nraagul@gmail.com](mailto:nraagul@gmail.com)
+- GitHub: [github.com/iaamraagul](https://github.com/iaamraagul)
+
+## License
+
+This project is provided as a portfolio and learning project. Add a project-specific license before redistributing it commercially.
