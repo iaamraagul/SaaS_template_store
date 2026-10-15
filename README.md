@@ -183,7 +183,3 @@ Built and maintained by **Raagul**.
 
 - Email: [nraagul@gmail.com](mailto:nraagul@gmail.com)
 - GitHub: [github.com/iaamraagul](https://github.com/iaamraagul)
-
-## License
-
-This project is provided as a portfolio and learning project. Add a project-specific license before redistributing it commercially.
