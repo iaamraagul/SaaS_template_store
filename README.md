@@ -51,6 +51,19 @@ npm run dev
 
 The frontend runs at `http://localhost:5173`; the API runs at `http://localhost:5000`.
 
+## Seed templates
+
+The seed script currently creates ten templates. Run it from the `server/` folder after `MONGODB_URI` points to the database you want to populate:
+
+```powershell
+cd server
+npm run seed
+```
+
+To add another template, add an object to the `templates` array in `server/src/utils/seed.js`. Use a unique `name`, a description, one of the existing thumbnail paths, a category, price, technology, and added label. Run `npm run seed` again; existing templates are updated by name and your new template is inserted. The script only removes the old sample records from the previous seed set, so it does not wipe custom templates.
+
+For Render, run `npm run seed` from the service Shell after setting `MONGODB_URI`, or run the same command locally with the production Atlas URI in a temporary uncommitted `server/.env` file.
+
 ## Routes
 
 | Path         | Purpose                                        |

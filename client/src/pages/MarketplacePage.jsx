@@ -16,6 +16,7 @@ export default function MarketplacePage() {
   const { favoriteIds, isAuthenticated, toggleFavorite } = useAuth();
   const navigate = useNavigate();
   const [templates, setTemplates] = useState(templateCatalog);
+  const [catalogReady, setCatalogReady] = useState(false);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(fallbackCategories[0]);
   const [error, setError] = useState("");
@@ -26,11 +27,16 @@ export default function MarketplacePage() {
     templateApi
       .list()
       .then((items) => {
-        if (active && items.length) setTemplates(items.map(presentTemplate));
+        if (active && items.length) {
+          setTemplates(items.map(presentTemplate));
+          setCatalogReady(true);
+        }
       })
       .catch(() => {
         if (active)
-          setError("Showing the local catalog while the API reconnects.");
+          setError(
+            "The live catalog is unavailable. Check VITE_API_URL before saving favorites.",
+          );
       });
 
     return () => {
@@ -65,6 +71,11 @@ export default function MarketplacePage() {
   };
 
   const handleFavorite = async (templateId) => {
+    if (!catalogReady) {
+      setError("The live catalog is still loading. Please try again shortly.");
+      return;
+    }
+
     if (!isAuthenticated) {
       navigate("/login?returnTo=%2Ftemplates");
       return;
@@ -132,6 +143,7 @@ export default function MarketplacePage() {
                   key={template.id}
                   template={template}
                   favorite={favoriteIds.includes(template.id)}
+                  disabled={!catalogReady}
                   onToggle={handleFavorite}
                 />
               ))}

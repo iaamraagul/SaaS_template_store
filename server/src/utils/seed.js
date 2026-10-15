@@ -62,13 +62,62 @@ const templates = [
     technology: "ANGULAR",
     added: "ADDED 2 WEEKS AGO",
   },
+  {
+    name: "Beacon Analytics",
+    description:
+      "A calm reporting workspace for teams that need fast answers from their data.",
+    thumbnail_url: "/templates/atlas-dashboard.jpg",
+    category: "DASHBOARD",
+    price: 74,
+    technology: "REACT",
+    added: "ADDED TODAY",
+  },
+  {
+    name: "Orbit Billing",
+    description:
+      "A clear subscription and invoice experience for growing SaaS teams.",
+    thumbnail_url: "/templates/vault-mobile.jpg",
+    category: "SAAS",
+    price: 64,
+    technology: "REACT",
+    added: "ADDED TODAY",
+  },
+  {
+    name: "Lantern Launch",
+    description:
+      "A conversion-focused product launch page with a bright, editorial rhythm.",
+    thumbnail_url: "/templates/nimbus-landing.jpg",
+    category: "LANDING",
+    price: 54,
+    technology: "NEXT.JS",
+    added: "ADDED TODAY",
+  },
+  {
+    name: "Relay CRM",
+    description:
+      "A focused customer workspace for managing contacts, deals, and follow-ups.",
+    thumbnail_url: "/templates/pipeline-crm.jpg",
+    category: "DASHBOARD",
+    price: 84,
+    technology: "VUE",
+    added: "ADDED TODAY",
+  },
+];
+
+const legacyTemplateNames = [
+  "Pulseboard",
+  "Northstar Commerce",
+  "Canvas Folio",
+  "Launchline",
+  "Signal Analytics",
+  "Atlas Admin",
+  "Bloom Finance",
+  "Studio Grid",
 ];
 
 await connectDb();
 
-await Template.deleteMany({
-  name: { $nin: templates.map((template) => template.name) },
-});
+await Template.deleteMany({ name: { $in: legacyTemplateNames } });
 
 await Template.bulkWrite(
   templates.map((template) => ({

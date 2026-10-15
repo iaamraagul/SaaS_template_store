@@ -5,6 +5,7 @@ export default function SaaSTemplateCard({
   favorite,
   onToggle,
   compact = false,
+  disabled = false,
 }) {
   const favoriteLabel = favorite ? "Remove" : "Add";
 
@@ -16,6 +17,7 @@ export default function SaaSTemplateCard({
         <img src={template.image} alt={`${template.name} preview`} />
         <button
           className={`heart-button ${favorite ? "is-favorite" : ""}`}
+          disabled={disabled}
           aria-label={`${favoriteLabel} ${template.name} ${favorite ? "from" : "to"} favorites`}
           onClick={() => onToggle(template.id)}
         >

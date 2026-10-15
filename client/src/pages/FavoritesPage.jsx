@@ -10,6 +10,7 @@ import { templateApi } from "../services/api";
 export default function FavoritesPage() {
   const { favoriteIds, toggleFavorite } = useAuth();
   const [templates, setTemplates] = useState(templateCatalog);
+  const [catalogReady, setCatalogReady] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -18,7 +19,10 @@ export default function FavoritesPage() {
     templateApi
       .list()
       .then((items) => {
-        if (active && items.length) setTemplates(items.map(presentTemplate));
+        if (active && items.length) {
+          setTemplates(items.map(presentTemplate));
+          setCatalogReady(true);
+        }
       })
       .catch(() => {
         if (active) setError("We could not refresh the marketplace catalog.");
@@ -63,6 +67,7 @@ export default function FavoritesPage() {
                   template={template}
                   favorite
                   compact
+                  disabled={!catalogReady}
                   onToggle={handleRemove}
                 />
               ))}

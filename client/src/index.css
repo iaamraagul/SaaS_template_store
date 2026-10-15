@@ -321,6 +321,11 @@ a {
 .heart-button:hover {
   transform: scale(1.06);
 }
+.heart-button:disabled {
+  cursor: wait;
+  opacity: 0.5;
+  transform: none;
+}
 .heart-button.is-favorite {
   color: #ef4c4d;
 }
